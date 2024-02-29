@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+from core.exceptions.exceptions import ApiException
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -8,21 +11,26 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password', 'password2']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        extra_kwargs = {'password': {'write_only': True}}
 
-    def save(self):
-        account = User(
-            email=self.validated_data['email'],
-            username=self.validated_data['email']
-        )
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise ApiException(error_code='USER_ALREADY_EXISTS',
+                               status_code=400,
+                               message='User with this email already exists',
+                               details={'email': value})
+        return value
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs.get('password2'):
+            raise ValidationError({'password': 'Passwords must match.'})
+        return attrs
+
+    def save(self, **kwargs):
+        email = self.validated_data['email']
         password = self.validated_data['password']
-        password2 = self.validated_data['password2']
 
-        if password != password2:
-            raise serializers.ValidationError({'password': 'Passwords must match.'})
-
+        account = User(email=email, username=email)
         account.set_password(password)
         account.save()
         return account

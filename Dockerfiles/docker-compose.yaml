@@ -1,0 +1,30 @@
+services:
+  back:
+    image: ypeskov/djangogramm:latest
+    env_file:
+      - .env
+    container_name: "djangogramm"
+    platform: "linux/amd64"
+    ports:
+      - 8000:8000
+    tty: true
+    volumes:
+      - ./media:/app/media
+    restart: always
+    environment:
+      - DEBUG=False
+    depends_on:
+      - db-djangogramm
+
+  db-djangogramm:
+    image: postgres:15.3-bullseye
+    container_name: Postgres-djangogramm
+    restart: always
+    environment:
+      # POSTGRES_USER: urlshortener
+      POSTGRES_PASSWORD: djangogramm
+    ports:
+      - 5432:5432
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+

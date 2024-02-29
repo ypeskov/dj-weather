@@ -1,0 +1,50 @@
+services:
+  back:
+    container_name: "djweather"
+    platform: "linux/amd64"
+    env_file:
+      - ${APP_ENV_FILE:-../.env}
+    build:
+      context: "../"
+      dockerfile: "./Dockerfiles/Dockerfile"
+      target: ${TARGET:-dev}
+    ports:
+      - 8000:8000
+      - 5678:5678
+    tty: true
+    volumes:
+      - ../djweather:/app
+      - ../pyproject.toml:/app/pyproject.toml
+      - ../poetry.lock:/app/poetry.lock
+    restart: always
+    # command: ["sh", "-c", "python -m debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+#    environment:
+#      - DEBUG=True
+#      - DB_HOST=db-djw
+#      - DB_PORT=5432
+#      - PYTHONPATH=/app:$PYTHONPATH
+#      - APP_ENV_FILE=${APP_ENV_FILE:-.env}
+#      - DJANGO_ENVIRONMENT=production
+#      - GOOGLE_APPLICATION_CREDENTIALS=/app/djangogramm/gcp-key.json
+#      - MOUNTED_SECRET=False
+    depends_on:
+      - db-djw
+
+  db-djw:
+    image: postgres:16.2-alpine
+    container_name: Postgres-djw
+    restart: always
+    environment:
+#      POSTGRES_USER: urlshortener
+      POSTGRES_PASSWORD: djw
+    ports:
+      - 5432:5432
+    volumes:
+      - ../dbdata:/var/lib/postgresql/data
+
+  adminer-djw:
+    image: adminer
+    container_name: Adminer-djangogramm
+    restart: always
+    ports:
+      - 8080:8080

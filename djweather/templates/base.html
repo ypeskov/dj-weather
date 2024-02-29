@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}DjangoGramm{% endblock %}</title>
+  <link rel="shortcut icon" href="{% static '/images/favicon.ico' %}" type="image/x-icon">
+
+  {% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% endblock %}
+</head>
+
+<body>
+<div id="app">
+  <header class="site-header">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="header-content">
+            <div class="logo"></div>
+            <h1 class="page-title">DjangoGramm</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        {% include 'partials/nav_menu.html' %}
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <main class="content">
+          {% block content %}
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <footer class="site-footer">
+          This is the footer
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+{% block javascript %}
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script type="module" src="{% static 'js/vue-bundle/bundle.js' %}"></script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "django-weather"
+version = "0.1.0"
+description = ""
+authors = ["Yuriy Peskov <yuriy.peskov@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+Django = "^5.0.2"
+psycopg = "^3.1.18"
+djangorestframework = "^3.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

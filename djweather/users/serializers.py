@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from core.exceptions.exceptions import ApiException
+from core.responses.exceptions.exceptions import ApiException
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

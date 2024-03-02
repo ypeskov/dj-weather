@@ -1,0 +1,17 @@
+[run]
+source = ./
+omit =
+    djweather/**
+    __init__.py
+    manage.py
+    */migrations/*
+    test_*.py
+    tests.py
+    conftest.py
+    admin.py
+    urls.py
+    apps.py
+    */management/commands/*
+
+[report]
+fail_under = 80

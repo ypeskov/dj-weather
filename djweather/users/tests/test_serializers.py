@@ -1,12 +1,12 @@
 import pytest
 from django.contrib.auth.models import User
-from rest_framework.exceptions import ValidationError
+
+from icecream import ic
 
 from users.serializers import UserRegistrationSerializer, UserInfoSerializer
 from core.responses.exceptions.exceptions import ApiException
 
 
-@pytest.mark.django_db
 def test_user_registration_serializer_success():
     valid_data = {
         'email': 'test@example.com',
@@ -20,7 +20,6 @@ def test_user_registration_serializer_success():
     assert user.email == 'test@example.com'
 
 
-@pytest.mark.django_db
 def test_user_registration_serializer_password_mismatch():
     invalid_data = {
         'email': 'testmismatch@example.com',
@@ -28,13 +27,13 @@ def test_user_registration_serializer_password_mismatch():
         'password2': 'password456'
     }
     serializer = UserRegistrationSerializer(data=invalid_data)
-    with pytest.raises(ValidationError):
+    with pytest.raises(ApiException) as e:
         serializer.is_valid(raise_exception=True)
+    assert e.value.error_code == 'PASSWORD_MISMATCH'
 
 
-@pytest.mark.django_db
-def test_user_registration_serializer_duplicate_email():
-    User.objects.create_user('existing@example.com', 'existing@example.com', 'password123')
+def test_user_registration_serializer_duplicate_email(create_user):
+    create_user(email='existing@example.com', username='existing@example.com', password='password123')
     invalid_data = {
         'email': 'existing@example.com',
         'password': 'newpassword123',
@@ -46,10 +45,9 @@ def test_user_registration_serializer_duplicate_email():
     assert exc_info.value.error_code == 'USER_ALREADY_EXISTS'
 
 
-@pytest.mark.django_db
-def test_user_info_serializer():
-    user = User.objects.create_user(username='userinfo@example.com', email='userinfo@example.com',
-                                    password='testpassword', first_name='Test', last_name='User')
+def test_user_info_serializer(create_user):
+    user = create_user(email='userinfo@example.com', first_name='Test', last_name='User',
+                       username='userinfo@example.com', password='password123')
     serializer = UserInfoSerializer(instance=user)
     expected_data = {
         'id': user.id,

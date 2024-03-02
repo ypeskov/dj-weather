@@ -23,7 +23,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs['password'] != attrs.get('password2'):
-            raise ValidationError({'password': 'Passwords must match.'})
+            raise ApiException(error_code='PASSWORD_MISMATCH',
+                               status_code=400,
+                               message='Passwords do not match',
+                               details={'password': 'Passwords do not match'})
         return attrs
 
     def save(self, **kwargs):

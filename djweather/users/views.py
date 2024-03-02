@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from icecream import ic
+
 from .serializers import UserRegistrationSerializer, UserInfoSerializer
 from core.responses.successes.successes import ApiSuccessResponse
 
@@ -26,8 +28,6 @@ class UserRegistrationView(APIView):
 @permission_classes([IsAuthenticated])
 def get_user_info(request):
     user = request.user
-    if user.is_anonymous:
-        return Response({"error": "Anonymous user"}, status=404)
 
     serializer = UserInfoSerializer(user)
     data, status_code = ApiSuccessResponse(

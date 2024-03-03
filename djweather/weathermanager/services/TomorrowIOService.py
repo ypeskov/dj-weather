@@ -19,7 +19,7 @@ class TomorrowIOService(WeatherService):
         super().__init__()
         self.api_key = API_KEY
 
-    def fetch_weather(self, uri, params=None, headers=None):
+    def _fetch_weather(self, uri, params=None, headers=None):
         if not headers:
             headers = {"accept": "application/json"}
 
@@ -35,7 +35,23 @@ class TomorrowIOService(WeatherService):
                 details=response.json()
             )
 
-    def get_current_weather(self, city):
+    def get_weather(self, city: str = None, weather_type: str = "current", **kwargs):
+        if city is None:
+            raise ApiException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                error_code='INVALID_INPUT',
+                message="City is required to fetch weather."
+            )
+        if weather_type == "current":
+            return self._get_current_weather(city)
+        else:
+            return self._get_forecast_weather(city)
+
+    def _get_current_weather(self, city):
         uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
-        return self.fetch_weather(uri)
+        return self._fetch_weather(uri)
+
+    def _get_forecast_weather(self, city):
+        uri = f"{endpoints.FORECAST_WEATHER}?location={city}"
+        return self._fetch_weather(uri)
 

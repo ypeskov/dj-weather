@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'users',
+    'weathermanager',
 ]
 
 MIDDLEWARE = [
@@ -153,6 +155,8 @@ CSRF_TRUSTED_ORIGINS = [f"https://{os.environ.get('CURRENT_HOST', 'localhost')}"
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+TOMORROW_IO_API_KEY = os.environ.get('TOMORROW_IO_API_KEY', '1234567890')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

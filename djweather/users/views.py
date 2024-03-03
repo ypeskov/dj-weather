@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 from icecream import ic
 
@@ -25,7 +25,6 @@ class UserRegistrationView(APIView):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_user_info(request):
     user = request.user
 

@@ -25,8 +25,17 @@ class TomorrowIOService(WeatherService):
 
         url = f"{BASE_URL}{uri}&apikey={self.api_key}"
         response = requests.get(url, headers=headers)
+        # ic(response.json())
+        # ic(response.status_code)
         if response.status_code == status.HTTP_200_OK:
             return response
+        elif response.status_code == status.HTTP_400_BAD_REQUEST and response.json().get('code') == 400001:
+            raise ApiException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                error_code='INVALID_CITY',
+                message="City is invalid. Please provide a valid city.",
+                details=response.json()
+            )
         else:
             raise ApiException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

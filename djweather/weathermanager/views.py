@@ -1,5 +1,3 @@
-import requests
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -29,8 +27,12 @@ class CurrentWeatherView(APIView):
                 return Response(data=data, status=status_code)
             except ApiException as e:
                 if isinstance(e, ApiException):
-                    # log exception
-                    ic(e)
+                    if e.error_code == 'INVALID_CITY':
+                        raise ApiException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            error_code='INVALID_CITY',
+                            message="City is invalid. Please provide a valid city."
+                        )
 
                 raise ApiException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

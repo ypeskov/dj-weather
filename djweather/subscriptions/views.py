@@ -7,6 +7,7 @@ from icecream import ic
 from core.responses.exceptions.exceptions import ApiException
 from core.responses.successes.successes import ApiSuccessResponse
 from .serializers import SubscriptionSerializer
+from .services import subscribe_user_to_weather_updates
 
 
 class SubscriptionView(APIView):
@@ -14,17 +15,18 @@ class SubscriptionView(APIView):
         serializer = SubscriptionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
             try:
-                serializer.save()
+                subscribe_user_to_weather_updates(serializer)
+
                 data, status_code = ApiSuccessResponse(
                     message="Subscription created successfully.",
                     details=serializer.data
                 ).to_response()
                 return Response(data=data, status=status_code)
             except ApiException as e:
-                if isinstance(e, ApiException):
-                    # log exception
-                    ic(e)
-
+                # log e
+                raise e
+            except Exception as e:
+                # log e
                 raise ApiException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     error_code='INTERNAL_SERVER_ERROR',

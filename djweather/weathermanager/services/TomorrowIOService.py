@@ -6,7 +6,7 @@ from django.conf import settings
 from icecream import ic
 
 from core.responses.exceptions.exceptions import ApiException
-from .WeatherService import WeatherService
+from .WeatherService import WeatherService, WeatherType
 from .TomorrowIOEndpoints import TomorrowIOEndpoints
 
 API_KEY = getattr(settings, 'TOMORROW_IO_API_KEY', '1111111111')
@@ -25,8 +25,6 @@ class TomorrowIOService(WeatherService):
 
         url = f"{BASE_URL}{uri}&apikey={self.api_key}"
         response = requests.get(url, headers=headers)
-        # ic(response.json())
-        # ic(response.status_code)
         if response.status_code == status.HTTP_200_OK:
             return response
         elif response.status_code == status.HTTP_400_BAD_REQUEST and response.json().get('code') == 400001:
@@ -51,7 +49,7 @@ class TomorrowIOService(WeatherService):
                 error_code='INVALID_INPUT',
                 message="City is required to fetch weather."
             )
-        if weather_type == "current":
+        if weather_type == WeatherType.CURRENT.value:
             return self._get_current_weather(city)
         else:
             return self._get_forecast_weather(city)

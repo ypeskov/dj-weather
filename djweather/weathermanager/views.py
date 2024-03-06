@@ -7,7 +7,8 @@ from icecream import ic
 from core.responses.exceptions.exceptions import ApiException
 from core.responses.successes.successes import ApiSuccessResponse
 from .serializers import CityWeatherSerializer
-from .services.TomorrowIOService import TomorrowIOService, WeatherService
+from .services.service_factory import get_weather_service
+from .services.WeatherService import WeatherService
 
 
 class CurrentWeatherView(APIView):
@@ -16,7 +17,7 @@ class CurrentWeatherView(APIView):
         if serializer.is_valid(raise_exception=True):
             city = serializer.validated_data.get('city')
 
-            service: WeatherService = TomorrowIOService()
+            service: WeatherService = get_weather_service()
             try:
                 response = service.get_weather(city)
                 serializer.validated_data['current_weather'] = response.json()

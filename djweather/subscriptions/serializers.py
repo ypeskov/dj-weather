@@ -31,7 +31,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.user
         city = attrs['city']
-        period_hours = attrs['period_hours']
+
         if Subscription.objects.filter(user=user, city=city).exists():
             raise ApiException(
                 error_code='SUBSCRIPTION_ALREADY_EXISTS',

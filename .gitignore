@@ -16,3 +16,4 @@ node_modules/
 djweather/static/js/vue-bundle/bundle.js
 djweather/poetry.lock
 djweather/pyproject.toml
+djweather/celerybeat-schedule

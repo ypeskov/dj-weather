@@ -2,12 +2,16 @@ import requests
 
 from rest_framework import status
 from django.conf import settings
+from django.core.cache import cache
+from celery.utils.log import get_task_logger
 
 from icecream import ic
 
 from core.responses.exceptions.exceptions import ApiException
 from .WeatherService import WeatherService, WeatherType
 from .TomorrowIOEndpoints import TomorrowIOEndpoints
+
+logger = get_task_logger(__name__)
 
 API_KEY = getattr(settings, 'TOMORROW_IO_API_KEY', '1111111111')
 BASE_URL = "https://api.tomorrow.io/v4"
@@ -55,8 +59,15 @@ class TomorrowIOService(WeatherService):
             return self._get_forecast_weather(city)
 
     def _get_current_weather(self, city):
-        uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
-        return self._fetch_weather(uri)
+        cached_data = cache.get(f"current_weather_{city}")
+        if cached_data:
+            logger.info(f"Using cached data for city: {city}")
+            return cached_data
+        else:
+            uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
+            response = self._fetch_weather(uri)
+            cache.set(f"current_weather_{city}", response.json(), 60 * 60)
+            return response
 
     def _get_forecast_weather(self, city):
         uri = f"{endpoints.FORECAST_WEATHER}?location={city}"

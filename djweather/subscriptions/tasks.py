@@ -1,0 +1,50 @@
+from datetime import timedelta
+
+from celery import shared_task
+from celery.utils.log import get_task_logger
+from django.utils import timezone
+from .models import Subscription
+
+from icecream import ic
+
+from weathermanager.services.service_factory import get_weather_service
+from weathermanager.services.WeatherService import WeatherService
+
+logger = get_task_logger(__name__)
+
+
+@shared_task
+def send_subscribed_notifications():
+    now = timezone.now()
+    subscriptions = Subscription.objects.filter(next_notification_datetime__lte=now)
+
+    for subscription in subscriptions:
+        service: WeatherService = get_weather_service()
+        weather = service.get_weather(subscription.city)
+        logger.info(f"Sending notification to user: {subscription.user.email} for city: {subscription.city}")
+        # print(weather)
+        # send_notification(subscription.user, subscription.city)
+
+        subscription.next_notification_datetime = now.replace(minute=0, second=0, microsecond=0) + timedelta(
+            hours=subscription.period_hours)
+
+        subscription.next_notification_datetime = (
+            subscription.next_notification_datetime.replace(minute=0, second=0, microsecond=0))
+        subscription.save()
+
+
+@shared_task
+def update_cache_for_upcoming_notifications():
+    now = timezone.now()
+
+    upcoming_notification_time = now + timedelta(hours=1)
+
+    subscriptions = Subscription.objects.filter(
+        next_notification_datetime__gt=now,
+        next_notification_datetime__lte=upcoming_notification_time
+    ).distinct('city')
+
+    cities = subscriptions.values_list('city', flat=True).distinct()
+    for city in cities:
+        service: WeatherService = get_weather_service()
+        service.get_weather(city)

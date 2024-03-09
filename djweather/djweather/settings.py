@@ -13,6 +13,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'weathermanager',
     'subscriptions',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -173,3 +176,17 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+CELERY_BROKER_URL = "redis://redis-djw:6379"
+CELERY_RESULT_BACKEND = "redis://redis-djw:6379"
+CELERY_BEAT_SCHEDULE = {
+    "notify_task": {
+        "task": "subscriptions.tasks.send_subscribed_notifications",
+        "schedule": crontab(minute="*/1"),
+    },
+    "update_cache_task": {
+        "task": "subscriptions.tasks.update_cache_for_upcoming_notifications",
+        "schedule": timedelta(seconds=30),
+    },
+}
+

@@ -29,6 +29,7 @@ services:
 #      - MOUNTED_SECRET=False
     depends_on:
       - db-djw
+      - redis-djw
 
   db-djw:
     image: postgres:16.2-alpine
@@ -48,3 +49,42 @@ services:
     restart: always
     ports:
       - 8080:8080
+
+  redis-djw:
+    image: redis:alpine
+    container_name: Redis-djw
+    restart: always
+
+  celery:
+    platform: "linux/amd64"
+    env_file:
+      - ${APP_ENV_FILE:-../.env}
+    build:
+      context: "../"
+      dockerfile: "./Dockerfiles/Dockerfile"
+      target: ${TARGET:-dev}
+    command: celery -A djweather worker -l info
+#    volumes:
+#      - ./project/:/usr/src/app/
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis-djw
+
+  celery-beat:
+    platform: "linux/amd64"
+    env_file:
+      - ${APP_ENV_FILE:-../.env}
+    build:
+      context: "../"
+      dockerfile: "./Dockerfiles/Dockerfile"
+      target: ${TARGET:-dev}
+    command: celery -A djweather beat -l info
+#    volumes:
+#      - ./project/:/usr/src/app/
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis-djw

@@ -48,7 +48,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         period_hours = self.validated_data['period_hours']
 
         current_datetime = datetime.now(timezone.utc)
-        next_notification_datetime = current_datetime + timedelta(hours=period_hours)
+        next_notification_datetime = (current_datetime + timedelta(hours=period_hours)).replace(minute=0, second=0,
+                                                                                                microsecond=0)
 
         subscription = Subscription(user=user,
                                     city=city,
@@ -57,3 +58,25 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         subscription.save()
 
         return subscription
+
+
+class UnsubscriptionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=False)
+
+    class Meta:
+        model = Subscription
+        fields = ['id', ]
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        user = request.user
+        subscription_id = attrs['id']
+
+        if not Subscription.objects.filter(user=user, id=subscription_id).exists():
+            raise ApiException(
+                error_code='SUBSCRIPTION_DOES_NOT_EXIST',
+                status_code=400,
+                message='Subscription with this user, does not exist',
+                details={'username': user.username, 'city': subscription_id}
+            )
+        return attrs

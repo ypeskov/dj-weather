@@ -13,6 +13,7 @@ ERROR_CODES = {
     'INVALID_CITY': (400, 'City is invalid. Please provide a valid city.'),
 
     'SUBSCRIPTION_ALREADY_EXISTS': (400, 'Subscription already exists'),
+    'SUBSCRIPTION_DOES_NOT_EXIST': (400, 'Subscription does not exist'),
 
     'UNKNOWN_ERROR': (500, 'Unknown error'),
 }

@@ -1,3 +1,4 @@
+import django
 
 from datetime import datetime, timezone
 
@@ -17,9 +18,9 @@ period_choices = (
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     city = models.CharField(max_length=50)
-    start_datetime = models.DateTimeField(default=lambda: datetime.now(timezone.utc))
+    start_datetime = models.DateTimeField(default=django.utils.timezone.now)
     next_notification_datetime = models.DateTimeField()
     period_hours = models.IntegerField(choices=period_choices)
 
     def __str__(self):
-        return f'{self.user.username} - {self.city}'
+        return f'{self.user.username} - {self.city}: {self.period_hours} hours, next at {self.next_notification_datetime}'

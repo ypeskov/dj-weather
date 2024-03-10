@@ -27,6 +27,7 @@ class CurrentWeatherView(APIView):
                 ).to_response()
                 return Response(data=data, status=status_code)
             except ApiException as e:
+                # ic(e)
                 if isinstance(e, ApiException):
                     if e.error_code == 'INVALID_CITY':
                         raise ApiException(

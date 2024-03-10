@@ -40,6 +40,7 @@ class TomorrowIOService(WeatherService):
             )
         else:
             logger.error(response.json())
+            # ic(response.json())
             raise ApiException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 error_code='INTERNAL_SERVER_ERROR',

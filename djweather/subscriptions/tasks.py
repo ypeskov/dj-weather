@@ -1,3 +1,5 @@
+import os
+
 from datetime import timedelta
 
 from celery import shared_task
@@ -70,8 +72,9 @@ def send_email(user_id, weather_json):
     email = EmailMessage(
         subject,
         html_content,
-        'yuriy.peskov@gmail.com',
-        [user.email],
+        from_email=os.environ.get('EMAIL_FROM'),
+        to=[user.email],
+        reply_to=[os.environ.get('EMAIL_FROM')],
     )
     email.content_subtype = "html"
     email.send()

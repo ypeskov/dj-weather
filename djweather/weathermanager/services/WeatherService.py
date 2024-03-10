@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from enum import Enum
 
 
@@ -7,7 +7,7 @@ class WeatherType(Enum):
     FORECAST = "forecast"
 
 
-class WeatherService:
+class WeatherService(ABC):
     def __init__(self):
         self.api_key = "1111111111"
 

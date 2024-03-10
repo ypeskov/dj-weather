@@ -20,7 +20,7 @@ class CurrentWeatherView(APIView):
             service: WeatherService = get_weather_service()
             try:
                 response = service.get_weather(city)
-                serializer.validated_data['current_weather'] = response.json()
+                serializer.validated_data['current_weather'] = response
                 data, status_code = ApiSuccessResponse(
                     message="Current weather fetched successfully.",
                     details=serializer.data

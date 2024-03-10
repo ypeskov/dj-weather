@@ -39,6 +39,7 @@ class TomorrowIOService(WeatherService):
                 details=response.json()
             )
         else:
+            logger.error(response.json())
             raise ApiException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 error_code='INTERNAL_SERVER_ERROR',
@@ -67,7 +68,7 @@ class TomorrowIOService(WeatherService):
             uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
             response = self._fetch_weather(uri)
             cache.set(f"current_weather_{city}", response.json(), 60 * 60)
-            return response
+            return response.json()
 
     def _get_forecast_weather(self, city):
         uri = f"{endpoints.FORECAST_WEATHER}?location={city}"

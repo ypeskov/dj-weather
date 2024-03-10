@@ -182,11 +182,11 @@ CELERY_RESULT_BACKEND = "redis://redis-djw:6379"
 CELERY_BEAT_SCHEDULE = {
     "notify_task": {
         "task": "subscriptions.tasks.send_subscribed_notifications",
-        "schedule": crontab(minute=f"*/{os.environ.get('TASK_PERIOD_MINUTES', 60)}"),
+        "schedule": crontab(hour=f"{os.environ.get('TASK_PERIOD_HOUR', 1)}"),
     },
     "update_cache_task": {
         "task": "subscriptions.tasks.update_cache_for_upcoming_notifications",
-        "schedule": crontab(minute=f"*/{os.environ.get('CACHE_UPDATE_PERIOD_MINUTES', 30)}"),
+        "schedule": crontab(minute=f"{os.environ.get('CACHE_UPDATE_PERIOD_MINUTES', 30)}"),
     },
 }
 

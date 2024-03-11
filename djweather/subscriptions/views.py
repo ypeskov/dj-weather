@@ -10,7 +10,7 @@ from icecream import ic
 from core.responses.exceptions.exceptions import ApiException
 from core.responses.successes.successes import ApiSuccessResponse
 from .serializers import SubscriptionSerializer, UnsubscriptionSerializer
-from .services import subscribe_user_to_weather_updates, unsubscribe_user_to_weather_updates
+from .services import subscribe_user_to_weather_updates, unsubscribe_user_to_weather_updates, get_user_subscriptions
 from .tasks import send_email
 
 
@@ -62,8 +62,18 @@ def unsubscribe(request):
             )
 
 
+@api_view(['GET'])
+def list_subscriptions(request):
+    """
+    List all subscriptions of the user.
+    """
+    subscriptions = get_user_subscriptions(request.user)
+    serializer = SubscriptionSerializer(subscriptions, many=True)
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
-def send_notification(request):
+def send_test_notification(request):
     """
     This is TEST endpoint for sending notification to user for the subscribed city.
     Send notification to user for the subscribed city.

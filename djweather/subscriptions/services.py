@@ -45,3 +45,19 @@ def unsubscribe_user_to_weather_updates(serializer: Serializer) -> bool:
             error_code='INTERNAL_SERVER_ERROR',
             message="Error while deleting subscription. Please try again later."
         )
+
+
+def get_user_subscriptions(user) -> list:
+    try:
+        subscriptions = Subscription.objects.filter(user=user)
+        return subscriptions
+    except ApiException as e:
+        raise e
+    except Exception as e:
+        # log e
+        ic(e)
+        raise ApiException(
+            status_code=500,
+            error_code='INTERNAL_SERVER_ERROR',
+            message="Error while fetching subscriptions. Please try again later."
+        )

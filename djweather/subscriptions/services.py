@@ -48,6 +48,7 @@ def unsubscribe_user_to_weather_updates(serializer: Serializer) -> bool:
 
 
 def get_user_subscriptions(user) -> list:
+    """Returns a list of subscriptions for a user."""
     try:
         subscriptions = Subscription.objects.filter(user=user)
         return subscriptions

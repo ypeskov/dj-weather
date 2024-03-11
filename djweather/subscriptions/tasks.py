@@ -41,6 +41,7 @@ def send_subscribed_notifications():
 
 @shared_task
 def update_cache_for_upcoming_notifications():
+    logger.info(f"************************** Begin Cache Update Task **************************")
     now = timezone.now()
 
     upcoming_notification_time = now + timedelta(hours=1)
@@ -53,9 +54,10 @@ def update_cache_for_upcoming_notifications():
     cities = subscriptions.values_list('city', flat=True).distinct()
     for city in cities:
         service: WeatherService = get_weather_service()
-        service.get_weather(city)
+        service.get_weather(city, force_cache_update=True)
 
-    logger.info(f"Cache updated for {len(cities)} cities")
+    logger.info(f"Cache update task ran for {len(cities)} cities")
+    logger.info(f"************************** End Cache Update Task **************************")
 
 
 @shared_task

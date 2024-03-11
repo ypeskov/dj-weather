@@ -13,11 +13,12 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from icecream import ic
+
 from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -28,8 +29,7 @@ SECRET_KEY = 'django-insecure--18pa$jc&7l+xeko+^wm-a8beqz%h4nbzs*6uxp&i162*d@b(a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
 
@@ -77,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djweather.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -94,7 +93,6 @@ DATABASES = {
         },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -114,7 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -125,7 +122,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -182,11 +178,12 @@ CELERY_RESULT_BACKEND = "redis://redis-djw:6379"
 CELERY_BEAT_SCHEDULE = {
     "notify_task": {
         "task": "subscriptions.tasks.send_subscribed_notifications",
-        "schedule": crontab(hour=f"{os.environ.get('TASK_PERIOD_HOUR', 1)}"),
+        "schedule": crontab(hour=f"{os.environ.get('TASK_PERIOD_HOUR', '*')}",
+                            minute=f"{os.environ.get('TASK_PERIOD_MINUTE', 0)}"),
     },
     "update_cache_task": {
         "task": "subscriptions.tasks.update_cache_for_upcoming_notifications",
-        "schedule": crontab(minute=f"{os.environ.get('CACHE_UPDATE_PERIOD_MINUTES', 30)}"),
+        "schedule": crontab(hour=f"{os.environ.get('CACHE_UPDATE_PERIOD_HOUR', '*')}",
+                            minute=f"{os.environ.get('CACHE_UPDATE_PERIOD_MINUTES', 30)}"),
     },
 }
-

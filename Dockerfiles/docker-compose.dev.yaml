@@ -64,11 +64,11 @@ services:
       dockerfile: "./Dockerfiles/Dockerfile"
       target: ${TARGET:-dev}
     command: celery -A djweather worker -l info
-#    volumes:
-#      - ./project/:/usr/src/app/
+    volumes:
+      - ../djweather:/app
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,[::1]
     depends_on:
       - redis-djw
 
@@ -81,10 +81,10 @@ services:
       dockerfile: "./Dockerfiles/Dockerfile"
       target: ${TARGET:-dev}
     command: celery -A djweather beat -l info
-#    volumes:
-#      - ./project/:/usr/src/app/
+    volumes:
+      - ../djweather:/app
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,[::1]
     depends_on:
       - redis-djw

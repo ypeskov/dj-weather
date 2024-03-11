@@ -48,7 +48,8 @@ class TomorrowIOService(WeatherService):
                 details=response.json()
             )
 
-    def get_weather(self, city: str = None, weather_type: str = "current", **kwargs):
+    def get_weather(self, city: str = None, weather_type: str = WeatherType.CURRENT.value,
+                    force_cache_update: bool = False, **kwargs):
         if city is None:
             raise ApiException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -56,16 +57,17 @@ class TomorrowIOService(WeatherService):
                 message="City is required to fetch weather."
             )
         if weather_type == WeatherType.CURRENT.value:
-            return self._get_current_weather(city)
+            return self._get_current_weather(city, force_cache_update=force_cache_update)
         else:
             return self._get_forecast_weather(city)
 
-    def _get_current_weather(self, city):
+    def _get_current_weather(self, city, force_cache_update: bool = False):
         cached_data = cache.get(f"current_weather_{city}")
-        if cached_data:
+        if cached_data and not force_cache_update:
             logger.info(f"Using cached data for city: {city}")
             return cached_data
         else:
+            logger.info(f"Fetching current weather for city: {city}")
             uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
             response = self._fetch_weather(uri)
             cache.set(f"current_weather_{city}", response.json(), 60 * 60)
@@ -74,4 +76,3 @@ class TomorrowIOService(WeatherService):
     def _get_forecast_weather(self, city):
         uri = f"{endpoints.FORECAST_WEATHER}?location={city}"
         return self._fetch_weather(uri)
-

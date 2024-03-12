@@ -7,7 +7,7 @@ fi
 
 TAG_VERSION=$1
 
-TARGET=prod docker-compose -f Dockerfiles/docker-compose.yaml --env-file .env build --no-cache && \
+TARGET=prod docker-compose -f Dockerfiles/docker-compose.dev.yaml --env-file .env build --no-cache && \
 docker tag dockerfiles-back ypeskov/djangogramm:"$TAG_VERSION" && \
 docker push ypeskov/djangogramm:"$TAG_VERSION" && \
 gcloud run deploy djangogramm \

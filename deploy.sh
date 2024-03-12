@@ -18,7 +18,7 @@ gcloud run deploy djw-app \
  --image ypeskov/djw:"$TAG_VERSION" \
  --platform managed \
  --region us-central1 \
- --update-env-vars=DB_HOST=34.88.248.216,DB_NAME=djw,DB_USER=djw,DB_PASSWORD=djw,DJANGO_DEBUG='False',DJANGO_ALLOWED_HOSTS=djw-app-pcyblpll6a-uc.a.run.app,TOMORROW_IO_API_KEY=hVAcvTA7FJ4R7VWdP36CwduuEIxe0wq4,EMAIL_HOST=smtp.gmail.com,EMAIL_PORT='587',EMAIL_USE_TLS='True',EMAIL_HOST_USER=yuriy.peskov@gmail.com,EMAIL_HOST_PASSWORD='qdno gztk dgaa rxpv',EMAIL_FROM=yuriy.peskov@gmail.com,HOST_REDIS='redis://34.88.248.216:6379' \
+ --update-env-vars=DB_HOST=34.88.248.216,DB_NAME=djw,DB_USER=djw,DB_PASSWORD=djw,DJANGO_DEBUG='False',DJANGO_ALLOWED_HOSTS=djw-app-pcyblpll6a-uc.a.run.app,TOMORROW_IO_API_KEY=hVAcvTA7FJ4R7VWdP36CwduuEIxe0wq4,EMAIL_HOST=smtp.gmail.com,EMAIL_PORT='587',EMAIL_USE_TLS='True',EMAIL_HOST_USER=yuriy.peskov@gmail.com,EMAIL_HOST_PASSWORD='aaaa',EMAIL_FROM=yuriy.peskov@gmail.com,HOST_REDIS='redis://34.88.248.216:6379' \
  --allow-unauthenticated && \
 
 echo "The image has been deplosyed to the Google Cloud Run: $TAG_VERSION" && \
@@ -38,7 +38,7 @@ echo "-------------------" && \
 # --region us-central1 \
 # --command "poetry" \
 # --args "run,celery,-A,djweather,worker,-l,info" \
-# --update-env-vars=DB_HOST=34.88.248.216,DB_NAME=djw,DB_USER=djw,DB_PASSWORD=djw,DJANGO_DEBUG='False',DJANGO_ALLOWED_HOSTS=djw-app-pcyblpll6a-uc.a.run.app,TOMORROW_IO_API_KEY=hVAcvTA7FJ4R7VWdP36CwduuEIxe0wq4,EMAIL_HOST=smtp.gmail.com,EMAIL_PORT='587',EMAIL_USE_TLS='True',EMAIL_HOST_USER=yuriy.peskov@gmail.com,EMAIL_HOST_PASSWORD='qdno gztk dgaa rxpv',EMAIL_FROM=yuriy.peskov@gmail.com,HOST_REDIS='redis://34.88.248.216:6379' \
+# --update-env-vars=DB_HOST=34.88.248.216,DB_NAME=djw,DB_USER=djw,DB_PASSWORD=djw,DJANGO_DEBUG='False',DJANGO_ALLOWED_HOSTS=djw-app-pcyblpll6a-uc.a.run.app,TOMORROW_IO_API_KEY=hVAcvTA7FJ4R7VWdP36CwduuEIxe0wq4,EMAIL_HOST=smtp.gmail.com,EMAIL_PORT='587',EMAIL_USE_TLS='True',EMAIL_HOST_USER=yuriy.peskov@gmail.com,EMAIL_HOST_PASSWORD='aaaa',EMAIL_FROM=yuriy.peskov@gmail.com,HOST_REDIS='redis://34.88.248.216:6379' \
 # --allow-unauthenticated && \
 #
 #echo "djw-celery has been deployed to the Google Cloud Run: $TAG_VERSION" && \

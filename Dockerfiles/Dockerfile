@@ -18,9 +18,12 @@ RUN poetry install --no-root
 
 COPY ./djweather/ /app
 
+COPY ./poetry.lock ./pyproject.toml /app/
+
 EXPOSE 8000
 
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+#CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 
 ###### Production stage ######
@@ -31,6 +34,8 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 RUN pip install poetry
+
+RUN poetry config virtualenvs.create false
 
 COPY --from=dev /app/ /app
 
@@ -47,4 +52,5 @@ EXPOSE 8000
 CMD ["poetry", "run", "gunicorn", "--bind", "0.0.0.0:8000", "djweather.wsgi:application"]
 #CMD ["poetry", "run", "gunicorn", "-w", "2", "--bind", "0.0.0.0:8000", "djweather.wsgi:application"]
 #CMD ["poetry", "run", "gunicorn", "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-", "--bind", "0.0.0.0:8000", "djweather.wsgi:application"]
-#CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+#CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:$PORT"]

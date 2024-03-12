@@ -173,8 +173,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CELERY_BROKER_URL = "redis://redis-djw:6379"
-CELERY_RESULT_BACKEND = "redis://redis-djw:6379"
+CELERY_BROKER_URL = os.environ.get("HOST_REDIS", "redis://redis-djw:6379")  # "redis://redis-djw:6379"
+CELERY_RESULT_BACKEND = os.environ.get("HOST_REDIS", "redis://redis-djw:6379")  # "redis://redis-djw:6379"
 CELERY_BEAT_SCHEDULE = {
     "notify_task": {
         "task": "subscriptions.tasks.send_subscribed_notifications",

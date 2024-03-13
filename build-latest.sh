@@ -29,8 +29,13 @@ elif [[ $1 == "push" ]]; then
     build_and_tag "${@:2}"
     docker push ypeskov/djw:${2:-latest}
 
-    ssh root@135.181.38.18 "sed -i 's|ypeskov/djw:[^[:space:]]*|ypeskov/djw:${2:-latest}|g' djw/Dockerfiles/docker-compose.yaml > djw/log.txt"
-    ssh root@135.181.38.18 "bash djw/run.sh"
+    echo "Updating docker-compose.yaml"
+    sed -i '' "s|ypeskov/djw:[^[:space:]]*|ypeskov/djw:${2:-latest}|g" Dockerfiles/docker-compose.yaml
+    echo "Updated docker-compose.yaml: $(grep -o "ypeskov/djw:[^[:space:]]*" Dockerfiles/docker-compose.yaml)"
+    echo "Pushing to server"
+    scp Dockerfiles/docker-compose.yaml root@135.181.38.18:djw/Dockerfiles/docker-compose.yaml
+#    ssh root@135.181.38.18 "bash djw/run.sh"
+    echo "Server updated. Please log in to and run run.sh to apply changes."
 
     echo "${2:-latest}" > version.txt
 else

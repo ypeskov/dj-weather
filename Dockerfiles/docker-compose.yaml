@@ -1,6 +1,6 @@
 services:
   back:
-    image: ypeskov/djw:latest
+    image: ypeskov/djw:0.53
     env_file:
       - ../.env
     container_name: "djw"
@@ -36,7 +36,7 @@ services:
     restart: always
 
   celery:
-      image: ypeskov/djw:latest
+      image: ypeskov/djw:0.53
 #      platform: "linux/amd64"
       env_file:
         - ${APP_ENV_FILE:-../.env}
@@ -45,7 +45,7 @@ services:
         - redis-djw
 
   celery-beat:
-    image: ypeskov/djw:latest
+    image: ypeskov/djw:0.53
 #    platform: "linux/amd64"
     env_file:
       - ${APP_ENV_FILE:-../.env}

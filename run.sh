@@ -12,7 +12,8 @@ run_docker() {
     else
         if screen -list | grep -q "$SCREEN_NAME"; then
             echo "Session '$SCREEN_NAME' is already running. Restarting the containers in it."
-            screen -S "$SCREEN_NAME" -X stuff $'docker-compose -f Dockerfiles/docker-compose.yaml --env-file="$CURR_DIR"/.env up --build -d\n'
+            screen -dmS "$SCREEN_NAME" /bin/bash -c "\
+            docker-compose -f Dockerfiles/docker-compose.yaml --env-file=\"$CURR_DIR\"/.env up --build --no-cache -d > \"$CURR_DIR/docker-compose-up.log\" 2>&1; exec sh"
         else
             echo "Session '$SCREEN_NAME' is not found. Creating a new one and starting the containers in it."
             screen -dmS "$SCREEN_NAME" /bin/bash -c "\

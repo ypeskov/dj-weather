@@ -20,6 +20,7 @@ build_and_tag() {
 
     eval $build_command
     docker tag djw ypeskov/djw:$tag
+    echo "$tag" > version.txt
 }
 
 if [[ $# -eq 0 ]]; then
@@ -27,6 +28,11 @@ if [[ $# -eq 0 ]]; then
 elif [[ $1 == "push" ]]; then
     build_and_tag "${@:2}"
     docker push ypeskov/djw:${2:-latest}
+
+    ssh root@135.181.38.18 "sed -i 's|ypeskov/djw:[^[:space:]]*|ypeskov/djw:${2:-latest}|g' djw/Dockerfiles/docker-compose.yaml > djw/log.txt"
+    ssh root@135.181.38.18 "bash djw/run.sh"
+
+    echo "${2:-latest}" > version.txt
 else
     echo "Usage:"
     echo "$0                                            # Build and tag :latest"

@@ -12,5 +12,5 @@ class ApiSuccessResponse:
         return {
             'response_code': self.response_code,
             'message': self.message,
-            'details': self.details
+            'details': self.details,
         }, self.status_code

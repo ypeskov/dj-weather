@@ -64,7 +64,8 @@ services:
       context: "../"
       dockerfile: "./Dockerfiles/Dockerfile"
       target: ${TARGET:-dev}
-    command: celery -A djweather worker -l info
+#    command: celery -A djweather worker -l info --concurrency=4
+    command: /bin/sh -c "celery -A djweather worker -l info --concurrency=$${CELERY_WORKER_CONCURRENCY:-4}"
     volumes:
       - ../djweather:/app
     environment:

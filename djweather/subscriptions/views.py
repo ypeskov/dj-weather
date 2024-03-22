@@ -11,7 +11,7 @@ from core.responses.exceptions.exceptions import ApiException
 from core.responses.successes.successes import ApiSuccessResponse
 from .serializers import SubscriptionSerializer, UnsubscriptionSerializer
 from .services import subscribe_user_to_weather_updates, unsubscribe_user_to_weather_updates, get_user_subscriptions
-from .tasks import send_email
+from .tasks import send_email, update_cache_for_upcoming_notifications
 
 
 class SubscriptionView(APIView):
@@ -116,3 +116,12 @@ def send_test_notification(request):
     weather_json = json.loads(weather)
     send_email.delay(request.user.id, weather_json)
     return Response(data={"message": "Notification sent successfully."}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def update_cache(request):
+    """
+    Update cache for upcoming notifications.
+    """
+    update_cache_for_upcoming_notifications.delay()
+    return Response(data={"message": "Cache update initiated."}, status=status.HTTP_200_OK)

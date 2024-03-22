@@ -64,10 +64,10 @@ class TomorrowIOService(WeatherService):
     def _get_current_weather(self, city, force_cache_update: bool = False):
         cached_data = cache.get(f"current_weather_{city}")
         if cached_data and not force_cache_update:
-            logger.info(f"Using cached data for city: {city}")
+            # logger.info(f"Using cached data for city: {city}")
             return cached_data
         else:
-            logger.info(f"Fetching current weather for city: {city}")
+            # logger.info(f"Fetching current weather for city: {city}")
             uri = f"{endpoints.REALTIME_WEATHER}?location={city}"
             response = self._fetch_weather(uri)
             cache.set(f"current_weather_{city}", response.json(), 60 * 60)

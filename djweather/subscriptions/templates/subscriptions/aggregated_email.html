@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Weather Update</title>
+</head>
+<body style="font-family: 'Arial', sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <h1 style="color: #007bff; text-align: center;">Hello!</h1>
+        <p style="font-size: 16px; text-align: center;">Here is the current weather update:</p>
+        {% for item in weather_data %}
+            <h2>{{ item.city }}</h2>
+            <ul style="list-style-type: none; padding: 0;">
+                <li>Temperature: <span style="color: #ff4500;">{{ item.weather.data.values.temperature }}°C</span></li>
+                <li>Feels like: <span style="color: #ffa07a;">{{ item.weather.data.values.temperatureApparent }}°C</span></li>
+                <li>Humidity: <span style="color: #1e90ff;">{{ item.weather.data.values.humidity }}%</span></li>
+                <li>Pressure: <span style="color: #6b8e23;">{{ item.weather.data.values.pressureSurfaceLevel }} hPa</span></li>
+                <li>Cloud cover: <span style="color: #778899;">{{ item.weather.data.values.cloudCover }}%</span></li>
+                <li>Visibility: <span style="color: #4682b4;">{{ item.weather.data.values.visibility }} km</span></li>
+                <li>Wind speed: <span style="color: #ff6347;">{{ item.weather.data.values.windSpeed }} m/s</span></li>
+                <li>Wind direction: <span style="color: #20b2aa;">{{ item.weather.data.values.windDirection }}°</span></li>
+            </ul>
+        {% endfor %}
+        <p style="font-size: 16px; text-align: center;">Stay safe and dress according to the weather!</p>
+    </div>
+</body>
+</html>

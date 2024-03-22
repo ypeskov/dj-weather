@@ -1,5 +1,6 @@
 import os
 
+from collections import defaultdict
 from datetime import timedelta, datetime
 
 from celery import shared_task
@@ -23,24 +24,41 @@ celery_workers_count = int(settings.CELERY_WORKER_CONCURRENCY)
 
 
 @shared_task
-def send_subscribed_notifications():
-    now = timezone.now()
-    subscriptions = Subscription.objects.filter(next_notification_datetime__lte=now)
+def send_subscribed_notifications(when: datetime = None):
+    # if when is None, then the task is called by the scheduler
+    if when is None:
+        now = timezone.now()
+    else:
+        now = when
 
-    logger.info(f"Found {len(subscriptions)} subscriptions to notify")
+    subscriptions: QuerySet = Subscription.objects.filter(next_notification_datetime__lte=now)
+    cities = subscriptions.values_list('city', flat=True).distinct()
 
-    for subscription in subscriptions:
+    city_weather = {}
+    for city in cities:
         service: WeatherService = get_weather_service()
-        weather = service.get_weather(subscription.city)
+        weather = service.get_weather(city)
+        city_weather[city] = weather
 
-        send_email.delay(subscription.user.id, weather)
+    user_weather = defaultdict(list)
+    for subscription in subscriptions:
+        weather = city_weather[subscription.city]
+        user_weather[subscription.user.id].append({
+            "city": subscription.city,
+            "weather": weather
+        })
 
-        subscription.next_notification_datetime = now.replace(minute=0, second=0, microsecond=0) + timedelta(
-            hours=subscription.period_hours)
+        # Update the next notification time if the task is NOT called with a specific time
+        if when is None:
+            subscription.next_notification_datetime = now.replace(minute=0, second=0, microsecond=0) + timedelta(
+                hours=subscription.period_hours)
+            subscription.next_notification_datetime = subscription.next_notification_datetime.replace(minute=0,
+                                                                                                      second=0,
+                                                                                                      microsecond=0)
+            subscription.save()
 
-        subscription.next_notification_datetime = (
-            subscription.next_notification_datetime.replace(minute=0, second=0, microsecond=0))
-        subscription.save()
+    for user_id, weather_info in user_weather.items():
+        send_aggregated_email.delay(user_id, weather_info)
 
     logger.info(f"Notifications sent for {len(subscriptions)} subscriptions")
 
@@ -96,18 +114,15 @@ def update_cache_for_city():
     update_cache_for_city.delay()
 
 
-
 @shared_task
-def send_email(user_id, weather_json):
+def send_aggregated_email(user_id, weather_info):
     User = get_user_model()
     user = User.objects.get(id=user_id)
 
-    subject = f"Current Weather in {weather_json['location']['name']}"
-    context = {
-        'city': weather_json['location']['name'],
-        'current_weather': weather_json,
-    }
-    html_content = render_to_string('subscriptions/email.html', context)
+    subject = "Current Weather Update"
+    context = {'weather_data': weather_info}
+    html_content = render_to_string('subscriptions/aggregated_email.html', context)
+
     email = EmailMessage(
         subject,
         html_content,
@@ -117,7 +132,3 @@ def send_email(user_id, weather_json):
     )
     email.content_subtype = "html"
     email.send()
-
-    # logger.info(f"Notification sent to {user.email} for city {weather_json['city']}")
-
-    return True

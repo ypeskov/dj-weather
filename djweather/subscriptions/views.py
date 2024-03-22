@@ -1,9 +1,10 @@
-import json
+from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from django.utils import timezone
 
 from icecream import ic
 
@@ -11,7 +12,7 @@ from core.responses.exceptions.exceptions import ApiException
 from core.responses.successes.successes import ApiSuccessResponse
 from .serializers import SubscriptionSerializer, UnsubscriptionSerializer
 from .services import subscribe_user_to_weather_updates, unsubscribe_user_to_weather_updates, get_user_subscriptions
-from .tasks import send_email, update_cache_for_upcoming_notifications
+from .tasks import update_cache_for_upcoming_notifications, send_subscribed_notifications
 
 
 class SubscriptionView(APIView):
@@ -74,47 +75,9 @@ def list_subscriptions(request):
 
 @api_view(['POST'])
 def send_test_notification(request):
-    """
-    This is TEST endpoint for sending notification to user for the subscribed city.
-    Send notification to user for the subscribed city.
-    """
-    weather = """
-{
-  "data": {
-    "time": "2024-03-10T18:17:00Z",
-    "values": {
-      "cloudBase": 0.16,
-      "cloudCeiling": 0.16,
-      "cloudCover": 55,
-      "dewPoint": 23.31,
-      "freezingRainIntensity": 0,
-      "humidity": 93,
-      "precipitationProbability": 0,
-      "pressureSurfaceLevel": 990.98,
-      "rainIntensity": 0,
-      "sleetIntensity": 0,
-      "snowIntensity": 0,
-      "temperature": 24.5,
-      "temperatureApparent": 24.5,
-      "uvHealthConcern": 0,
-      "uvIndex": 0,
-      "visibility": 16,
-      "weatherCode": 1101,
-      "windDirection": 132.81,
-      "windGust": 1.81,
-      "windSpeed": 0.88
-    }
-  },
-  "location": {
-    "lat": -15.253840446472168,
-    "lon": 48.25621795654297,
-    "name": "Sofia, Province de Mahajanga, Madagasikara / Madagascar",
-    "type": "state"
-  }
-}
-    """
-    weather_json = json.loads(weather)
-    send_email.delay(request.user.id, weather_json)
+    now: datetime = timezone.now()
+    upcoming_notification_time: datetime = now + timedelta(hours=1)
+    send_subscribed_notifications.delay(upcoming_notification_time)
     return Response(data={"message": "Notification sent successfully."}, status=status.HTTP_200_OK)
 
 

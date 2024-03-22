@@ -1,6 +1,6 @@
 services:
   back:
-    image: ypeskov/djw:0.53
+    image: ypeskov/djw:0.54
     env_file:
       - ../.env
     container_name: "djw"
@@ -36,16 +36,16 @@ services:
     restart: always
 
   celery:
-      image: ypeskov/djw:0.53
+      image: ypeskov/djw:0.54
 #      platform: "linux/amd64"
       env_file:
         - ${APP_ENV_FILE:-../.env}
-      command: poetry run celery -A djweather worker -l info
+      command: /bin/sh -c "celery -A djweather worker -l info --concurrency=$${CELERY_WORKER_CONCURRENCY:-4}"
       depends_on:
         - redis-djw
 
   celery-beat:
-    image: ypeskov/djw:0.53
+    image: ypeskov/djw:0.54
 #    platform: "linux/amd64"
     env_file:
       - ${APP_ENV_FILE:-../.env}

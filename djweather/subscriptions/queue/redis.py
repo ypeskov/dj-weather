@@ -1,7 +1,6 @@
 from django.conf import settings
 from redis import Redis
 from celery.utils.log import get_task_logger
-from contextlib import suppress
 
 redis_broke = settings.CELERY_BROKER_URL
 redis = Redis.from_url(redis_broke)
@@ -11,12 +10,14 @@ logger = get_task_logger(__name__)
 
 def insert_cities_to_queue(cities: list, max_attempts: int = 5) -> bool:
     for attempt in range(1, max_attempts + 1):
-        with suppress(Exception):
+        try:
             current_cities_count: int = redis.llen('__cities__')
             updated_cities_count: int = redis.rpush('__cities__', *cities)
             if updated_cities_count - current_cities_count == len(cities):
                 return True
-        logger.error(f"Error while inserting cities to queue. Attempt {attempt}/{max_attempts}", exc_info=True)
+        except Exception as e:
+            logger.error(f"Error while inserting cities to queue. Attempt {attempt}/{max_attempts}. Error: {e}",
+                         exc_info=True)
     return False
 
 
